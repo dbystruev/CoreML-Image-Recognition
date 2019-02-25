@@ -12,6 +12,7 @@
 		69416BD12224602C00997C2F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69416BCF2224602C00997C2F /* Main.storyboard */; };
 		69416BD32224603700997C2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69416BD22224603700997C2F /* Assets.xcassets */; };
 		69416BD62224603700997C2F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69416BD42224603700997C2F /* LaunchScreen.storyboard */; };
+		69416BDE2224652A00997C2F /* Inceptionv3.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 69416BDD2224652A00997C2F /* Inceptionv3.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		69416BD22224603700997C2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		69416BD52224603700997C2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		69416BD72224603700997C2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		69416BDD2224652A00997C2F /* Inceptionv3.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Inceptionv3.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 		69416BCA2224602C00997C2F /* CoreML Image Recognition */ = {
 			isa = PBXGroup;
 			children = (
+				69416BDF2224653C00997C2F /* MLModel */,
 				69416BCB2224602C00997C2F /* AppDelegate.swift */,
 				69416BCD2224602C00997C2F /* ViewController.swift */,
 				69416BCF2224602C00997C2F /* Main.storyboard */,
@@ -62,6 +65,15 @@
 				69416BD72224603700997C2F /* Info.plist */,
 			);
 			path = "CoreML Image Recognition";
+			sourceTree = "<group>";
+		};
+		69416BDF2224653C00997C2F /* MLModel */ = {
+			isa = PBXGroup;
+			children = (
+				69416BDD2224652A00997C2F /* Inceptionv3.mlmodel */,
+			);
+			name = MLModel;
+			path = MLMo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -136,6 +148,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69416BCE2224602C00997C2F /* ViewController.swift in Sources */,
+				69416BDE2224652A00997C2F /* Inceptionv3.mlmodel in Sources */,
 				69416BCC2224602C00997C2F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
