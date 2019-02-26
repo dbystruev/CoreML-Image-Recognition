@@ -10,33 +10,47 @@ import AVFoundation
 import UIKit
 
 class ViewController: UIViewController {
-
+    
+    // MARK: - ... @IBOutlet
+    /// Label which will hold the most likely object recognized
     @IBOutlet weak var descriptionLabel: UILabel!
     
+    /// Capture activity manager and coordinator
     var captureSession = AVCaptureSession()
+    
+    /// Core animation layer to display captured video
     var videoPreviewLayer: AVCaptureVideoPreviewLayer?
     
+    /// Prediction model from https://developer.apple.com/machine-learning/build-run-models/
     var mlModel = Inceptionv3()
-
+    
+    // MARK: - ... UIViewController Methods
+    // Configure the capturing when loaded
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
     }
     
+    // Start capturing session when view appears
     override func viewDidAppear(_ animated: Bool) {
         captureSession.startRunning()
     }
     
+    // Stop capturing session when view disappears
     override func viewDidDisappear(_ animated: Bool) {
         captureSession.stopRunning()
     }
     
+    // MARK: - ... Custom Methods
+    /// Configure the capturing
     func configure() {
+        // Get the default device for capturing video
         guard let captureDevice = AVCaptureDevice.default(for: .video) else {
-            print(#function, "Can't get capture device")
+            print("ERROR in \(#function) at line \(#line): Can't get capture device")
             return
         }
         
+        // Get input from video to capture session
         do {
             let input = try AVCaptureDeviceInput(device: captureDevice)
             
@@ -47,31 +61,29 @@ class ViewController: UIViewController {
             videoDataOutput.alwaysDiscardsLateVideoFrames = true
             captureSession.addOutput(videoDataOutput)
         } catch {
-            print(#function, error.localizedDescription)
+            print("ERROR in \(#function) at line \(#line): \(error.localizedDescription)")
             return
         }
         
+        // Setup video preview layer
         videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         videoPreviewLayer?.videoGravity = .resizeAspectFill
         videoPreviewLayer?.frame = view.layer.bounds
         view.layer.addSublayer(videoPreviewLayer!)
         
+        // Setup description label
         descriptionLabel.text = "Looking for objects..."
         view.bringSubviewToFront(descriptionLabel)
     }
-    
-//    func prediction(image: CVPixelBuffer) throws -> Inceptionv3Output {
-//        let input = Inception3Input(image: image)
-//        return try mlModel.prediction(input: input)
-//    }
-    
 }
 
+// MARK: - ... AVCaptureVideoDataOutputSampleBufferDelegate
 extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
         connection.videoOrientation = .portrait
         
+        // Resize the frame to 299x299 as required by inceptionv3 model
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
@@ -85,6 +97,8 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let resizedImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
+        // Convert UIImage to CVPixelBuffer
+        // See https://stackoverflow.com/questions/44462087/how-to-convert-a-uiimage-to-a-cvpixelbuffer
         let attrs = [
             kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
             kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue
@@ -126,15 +140,18 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         
         CVPixelBufferUnlockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
         
+        // Pass pixel buffer to Core ML model for predictions
         if let pixelBuffer = pixelBuffer {
             guard let output = try? mlModel.prediction(image: pixelBuffer) else {
                 return
             }
             
+            // Update the label with most likely category
             DispatchQueue.main.async {
                 self.descriptionLabel.text = output.classLabel
             }
             
+            // Print all other categories detected
             for (key, value) in output.classLabelProbs {
                 print("\(key) = \(value)")
             }
