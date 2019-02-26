@@ -148,7 +148,11 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             
             // Update the label with most likely category
             DispatchQueue.main.async {
-                self.descriptionLabel.text = output.classLabel
+                let label = output.classLabel
+                let value = output.classLabelProbs[label] ?? 0
+                let intValue = Int(round(100 * value))
+                
+                self.descriptionLabel.text = "\(intValue)% \(label)"
             }
             
             // Print all other categories detected
