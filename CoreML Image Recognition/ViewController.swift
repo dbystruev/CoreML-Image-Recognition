@@ -31,6 +31,11 @@ class ViewController: UIViewController {
         captureSession.stopRunning()
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        videoPreviewLayer?.frame.size = size
+    }
+    
     func configure() {
         guard let captureDevice = AVCaptureDevice.default(for: .video) else {
             print(#function, "Can't get capture device")
