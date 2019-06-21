@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     var videoPreviewLayer: AVCaptureVideoPreviewLayer?
     
     var mlModel = Inceptionv3()
+//    var mlModel = MNISTClassifier()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,8 +66,13 @@ class ViewController: UIViewController {
         view.bringSubviewToFront(descriptionLabel)
     }
     
-//    func prediction(image: CVPixelBuffer) throws -> Inceptionv3Output {
-//        let input = Inception3Input(image: image)
+    func prediction(image: CVPixelBuffer) throws -> Inceptionv3Output {
+        let input = Inceptionv3Input(image: image)
+        return try mlModel.prediction(input: input)
+    }
+    
+//    func prediction(image: CVPixelBuffer) throws -> MNISTClassifierOutput {
+//        let input = MNISTClassifierInput(image: image)
 //        return try mlModel.prediction(input: input)
 //    }
     
@@ -90,6 +96,11 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let resizedImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
+//        UIGraphicsBeginImageContext(CGSize(width: 28, height: 28))
+//            image.draw(in: CGRect(x: 0, y: 0, width: 28, height: 28))
+//            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()!
+//        UIGraphicsEndImageContext()
+        
         let attrs = [
             kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
             kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue
@@ -102,6 +113,7 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             Int(resizedImage.size.width),
             Int(resizedImage.size.height),
             kCVPixelFormatType_32ARGB,
+//            kCVPixelFormatType_OneComponent8,
             attrs,
             &pixelBuffer
         )
@@ -112,6 +124,7 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer!)
         
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
+        
         let context = CGContext(
             data: pixelData,
             width: Int(resizedImage.size.width),
@@ -119,7 +132,9 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             bitsPerComponent: 8,
             bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer!),
             space: rgbColorSpace,
+//            space: CGColorSpaceCreateDeviceGray(),
             bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue
+//            bitmapInfo: CGImageAlphaInfo.none.rawValue
         )
         
         context?.translateBy(x: 0, y: resizedImage.size.height)
@@ -137,12 +152,16 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
             
             DispatchQueue.main.async {
-                self.descriptionLabel.text = output.classLabel
+                self.descriptionLabel.text = "\(output.classLabel)"
             }
             
             for (key, value) in output.classLabelProbs {
                 print("\(key) = \(value)")
             }
+            
+//            for (key, value) in output.labelProbabilities {
+//                print("\(key) = \(value)")
+//            }
         }
     }
 }
